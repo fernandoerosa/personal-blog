@@ -1,0 +1,68 @@
+version: '3.3'
+
+services:
+  app-blog:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app-blog
+    container_name: app-blog
+    environment:
+      DB_HOST: db-blog
+      DB_PORT: 3306
+      DB_DATABASE: personalblog
+      DB_USERNAME: root
+      DB_PASSWORD: personalblog
+      FILESYSTEM_DRIVER: public
+    networks:
+      - blog-network
+    depends_on:
+      - db-blog
+    volumes:
+      - ./:/var/www
+      - ./docker/php/uploads.ini:/usr/local/lib/php/conf.d/uploads.ini
+
+  db-blog:
+    image: mysql:5.7.22
+    container_name: db-blog
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: personalblog
+      MYSQL_DATABASE: personalblog
+    volumes:
+      - ./docker/config/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+      - db-blog:/var/lib/mysql/
+    networks:
+      - blog-network
+
+  nginx-vdv:
+    image: nginx:latest
+    container_name: nginx-vdv
+    env_file:
+      - .env
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app-blog
+    networks:
+      - blog-network
+
+  redis-vdv:
+    image: redis
+    container_name: redis-vdv
+    restart: always
+    networks:
+      - blog-network
+
+networks:
+  blog-network:
+    driver: bridge
+
+volumes:
+  db-blog:
