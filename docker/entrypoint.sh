@@ -1,8 +1,4 @@
 #!/bin/bash
-
-php composer.phar update && \
-    chown -R www-data:www-data /var/www/storage && \
-    npm i && \
+    php composer.phar run-script post-root-package-install && \
     php artisan migrate && \
-    php artisan storage:link && \
-    php-fpm
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

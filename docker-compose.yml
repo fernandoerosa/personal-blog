@@ -7,56 +7,34 @@ services:
       dockerfile: Dockerfile
     image: app-blog
     container_name: app-blog
+    ports:
+      - "9000:8080"
     environment:
       DB_HOST: db-blog
-      DB_PORT: 3306
-      DB_DATABASE: personalblog
+      DB_PORT: 5432
+      DB_DATABASE: homestead
       DB_USERNAME: root
-      DB_PASSWORD: personalblog
+      DB_PASSWORD: root
       FILESYSTEM_DRIVER: public
     networks:
       - blog-network
     depends_on:
       - db-blog
     volumes:
-      - ./:/var/www
-      - ./docker/php/uploads.ini:/usr/local/lib/php/conf.d/uploads.ini
+      - vendor:/var/www/vendor 
+      - .:/var/www
 
   db-blog:
-    image: mysql:5.7.22
+    image: postgres:latest
     container_name: db-blog
-    env_file:
-      - .env
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: personalblog
-      MYSQL_DATABASE: personalblog
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=homestead
     volumes:
-      - ./docker/config/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
       - db-blog:/var/lib/mysql/
-    networks:
-      - blog-network
-
-  nginx-vdv:
-    image: nginx:latest
-    container_name: nginx-vdv
-    env_file:
-      - .env
-    ports:
-      - "8000:80"
-    volumes:
-      - ./:/var/www/
-      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - app-blog
-    networks:
-      - blog-network
-
-  redis-vdv:
-    image: redis
-    container_name: redis-vdv
-    restart: always
     networks:
       - blog-network
 
@@ -66,3 +44,4 @@ networks:
 
 volumes:
   db-blog:
+  vendor:

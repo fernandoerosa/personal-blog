@@ -1,61 +1,77 @@
-FROM php:7.4-fpm
+# Define a imagem base
+ARG ALPINE_VERSION=3.14
+FROM alpine:${ALPINE_VERSION}
+LABEL Maintainer="Fernando Rosa"
+LABEL Description="Lightweight container with Nginx 1.24 & PHP 8.2 based on Alpine Linux."
 
-# Instala os pacotes necessários
-RUN apt-get update && \
-    apt-get install -y \
-    git \
-    nodejs \
-    npm \
-    unzip \
-    libzip-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
-    wkhtmltopdf \
-    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) \
-    gd \
-    mysqli \
-    pdo \
-    pdo_mysql \
-    mbstring \
-    zip \
-    exif \
-    pcntl \
-    bcmath \
-    sockets
-
-RUN yes | pecl install xdebug-2.9.0 \
-    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini
-
-# Define o diretório de trabalho
+# Setup document root
 WORKDIR /var/www
 
-# Copia os arquivos necessários para a imagem
-COPY . .
+# Install packages and remove default server definition
+RUN apk add --no-cache \
+  openjdk11 \
+  curl \
+  nginx \
+  php7 \
+  php7-ctype \
+  php7-curl \
+  php7-dom \
+  php7-fpm \
+  php7-gd \
+  php7-intl \
+  php7-mbstring \
+  php7-mysqli \
+  php7-opcache \
+  php7-openssl \
+  php7-phar \
+  php7-session \
+  php7-xml \
+  php7-xmlreader \
+  php7-fileinfo \
+  php7-simplexml \
+  php7-xmlwriter \
+  php7-zip \
+  php7-tokenizer \
+  postgresql-dev \
+  php7-pdo \
+  php7-pdo_pgsql \
+  php7-json \
+  php7-exif \
+  supervisor
 
-# Copia o arquivo de configuração Nginx
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+# Configure nginx - http
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+# Configure nginx - default server
+COPY docker/conf.d /etc/nginx/conf.d/
 
-# Limpa o cache do sistema
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Configure PHP-FPM
+ENV PHP_INI_DIR /etc/php7
+COPY docker/fpm-pool.conf ${PHP_INI_DIR}/php-fpm.d/www.conf
+COPY docker/php.ini ${PHP_INI_DIR}/conf.d/custom.ini
 
-RUN touch /var/www/storage/logs/laravel.log
+# Configure supervisord
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Define as permissões dos arquivos
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap /var/www/storage/logs/laravel.log
+# Make sure files/folders needed by the processes are accessable when they run under the nobody user
+RUN chown -R nobody.nobody /var/www /run /var/lib/nginx /var/log/nginx
 
-RUN chown -R 777 /var/www/storage
+# Configure a healthcheck to validate that everything is up&running
+HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 
-RUN chmod -R 777 /var/www/storage
+COPY . /var/www/
 
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
+RUN chown -R nobody.nobody  /var/www/storage
+RUN chown -R nobody.nobody  /var/www/
+RUN chmod -R 775 /var/www/storage
+RUN chmod -R 775 /var/www/
 
-# Inicia o servidor PHP-FPM
-ENTRYPOINT ["sh",  "./docker/entrypoint.sh"]
+# Instala as dependências do projeto usando o composer.phar
+RUN php composer.phar update --no-interaction
+
+# Define a porta que o container deve expor
+EXPOSE 8080
+
+USER nobody
+
+# Executa o servidor PHP-FPM
+ENTRYPOINT ["sh",  "/var/www/docker/entrypoint.sh"]
