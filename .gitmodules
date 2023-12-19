@@ -1,0 +1,6 @@
+[submodule "database/database"]
+	path = database/database
+	url = https://github.com/fernandoerosa/migrations.git
+[submodule "database/migrations"]
+	path = database/migrations
+	url = https://github.com/fernandoerosa/migrations.git
