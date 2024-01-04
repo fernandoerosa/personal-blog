@@ -1,5 +1,6 @@
 # Define a imagem base
 ARG ALPINE_VERSION=3.14
+
 FROM alpine:${ALPINE_VERSION}
 LABEL Maintainer="Fernando Rosa"
 LABEL Description="Lightweight container with Nginx 1.24 & PHP 8.2 based on Alpine Linux."

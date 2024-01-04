@@ -13,7 +13,7 @@
 			<div class="col-md-12 col-lg-8 main-content">
 			  <img src="{{ asset('storage/' . $article->header_articles) }}" alt="{{ $article->title }}" class="img-fluid mb-5">
 			   <div class="post-meta">
-					<span class="author mr-2"><img src="{{ asset('front/images/person_rifki.jpg')}}" alt="Colorlib" class="mr-2"> {{$article->created_by}}</span>&bullet;
+					<span class="author mr-2"><img src="{{ asset('front/images/person_fernando.jpg')}}" alt="Colorlib" class="mr-2"> {{$article->created_by}}</span>&bullet;
 					<span class="mr-2">{{$article->created_at->format('d F Y')}}</span> &bullet;
 					<span class="ml-2"><span class="fa fa-comments"></span> {{$article->publish_comments->count()}}</span>
 				</div>

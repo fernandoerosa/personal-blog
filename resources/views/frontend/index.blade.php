@@ -1,7 +1,7 @@
 @extends('layouts.frontend')
 
 @section('title')
-    <title>RifkiDev.id</title>
+    <title>Ovini.tech</title>
 @endsection
 
 @section('content')
@@ -18,7 +18,7 @@
 						          <span class="category mb-5">{{$lat->category->name}}</span>
                       <div class="post-meta">
                         
-                        <span class="author mr-2"><img src="{{ asset('front/images/person_rifki.jpg') }}" alt="Colorlib"> {{$lat->created_by}}</span>&bullet;
+                        <span class="author mr-2"><img src="{{ asset('front/images/person_fernando.jpg') }}" alt="Colorlib"> {{$lat->created_by}}</span>&bullet;
                         <span class="mr-2">{{$lat->created_at->format('d F Y')}}</span> &bullet;
                         <span class="ml-2"><span class="fa fa-comments"></span> {{$lat->publish_comments->count()}}</span>
                         
@@ -53,7 +53,7 @@
                     <img src="{{ asset('storage/' . $row->header_articles) }}" alt="{{ $row->title }}">
                     <div class="blog-content-body">
                     <div class="post-meta">
-                      <span class="author mr-2"><img src="{{ asset('front/images/person_rifki.jpg') }}" alt="Colorlib"> {{$row->created_by}}</span>&bullet;
+                      <span class="author mr-2"><img src="{{ asset('front/images/person_fernando.jpg') }}" alt="Colorlib"> {{$row->created_by}}</span>&bullet;
                       <span class="mr-2">{{$row->category->name}}</span> &bullet;
                       <span class="ml-2"><span class="fa fa-comments"></span> {{$row->publish_comments->count()}}</span>
                     </div>

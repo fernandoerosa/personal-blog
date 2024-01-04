@@ -1,7 +1,7 @@
   <div class="col-md-12 col-lg-4 sidebar">
     <div class="sidebar-box">
       <div class="bio text-center">
-        <img src="{{ asset('front/images/person_rifki.jpg') }}" alt="Image Placeholder" class="img-fluid">
+        <img src="{{ asset('front/images/person_fernando.jpg') }}" alt="Image Placeholder" class="img-fluid">
         <div class="bio-body">
           <h2>{{ $setting->owner }}</h2>
            <p>{{ $setting->bio }}</p>
